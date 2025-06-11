@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulación de Inyección SQL</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef3f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .contenedor {
+      display: flex;
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .formulario, .explicacion {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      flex: 1;
+    }
+
+    h2 {
+      text-align: center;
+      color: #007acc;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #007acc;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005f99;
+    }
+
+    .resultado {
+      background-color: #f7f9fc;
+      padding: 15px;
+      border-left: 5px solid #007acc;
+      border-radius: 4px;
+    }
+
+    .alerta {
+      background-color: #ffe5e5;
+      border-left: 5px solid red;
+      padding: 10px;
+      margin-top: 10px;
+      color: #b30000;
+      border-radius: 4px;
+    }
+
+    .seguro {
+      background-color: #e5ffe5;
+      border-left: 5px solid green;
+      padding: 10px;
+      margin-top: 10px;
+      color: #006600;
+      border-radius: 4px;
+    }
+
+    code {
+      background-color: #f0f0f0;
+      display: block;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .explicacion p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .explicacion a {
+      color: #007acc;
+      text-decoration: none;
+    }
+
+    .explicacion a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor">
+    <!-- Formulario de inicio de sesión -->
+    <div class="formulario">
+      <h2>Simulación de Inyección SQL</h2>
+      <form onsubmit="simular(event)">
+        <label for="usuario">Nombre de usuario:</label>
+        <input type="text" id="usuario" value="valery">
+
+        <label for="clave">Contraseña:</label>
+        <input type="text" id="clave" value="1234">
+
+        <button type="submit">Iniciar sesión</button>
+      </form>
+
+      <div id="resultado"></div>
+    </div>
+
+    <!-- Explicación -->
+    <div class="explicacion">
+      <h2>¿Qué está ocurriendo?</h2>
+      <p>
+        Este formulario simula un inicio de sesión vulnerable a <strong>inyección SQL</strong>. La aplicación crea internamente una consulta similar a:
+      </p>
+      <code>SELECT * FROM usuarios WHERE usuario = '...' AND clave = '...'</code>
+      <p>
+        Si introduces cadenas maliciosas como <code>' OR '1'='1</code>, el sistema detecta que la consulta puede ser modificada y te alerta del riesgo.  
+      </p>
+      <p>
+        Es una forma sencilla de visualizar una de las vulnerabilidades más comunes según <a href="https://owasp.org" target="_blank">OWASP</a>.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const usuariosValidos = [
+      { usuario: "valery", clave: "1234" },
+      { usuario: "admin", clave: "admin123" }
+    ];
+
+    function contieneInyeccion(texto) {
+      const patrones = ["'", "--", "1=1", "OR", "AND", ";"];
+      return patrones.some(p => texto.toUpperCase().includes(p));
+    }
+
+    function simular(event) {
+      event.preventDefault();
+
+      const usuario = document.getElementById("usuario").value.trim();
+      const clave = document.getElementById("clave").value.trim();
+      const consultaSQL = `SELECT * FROM usuarios WHERE usuario = '${usuario}' AND clave = '${clave}'`;
+
+      let html = `
+        <div class="resultado">
+          <strong>Consulta generada:</strong>
+          <code>${consultaSQL}</code>
+      `;
+
+      if (contieneInyeccion(usuario) || contieneInyeccion(clave)) {
+        html += `
+          <div class="alerta">
+            ⚠️ Posible inyección SQL detectada.<br>
+            Esta consulta podría ser manipulada maliciosamente.
+          </div>
+        `;
+      } else {
+        const valido = usuariosValidos.some(
+          u => u.usuario === usuario && u.clave === clave
+        );
+
+        if (valido) {
+          html += `
+            <div class="seguro">
+              ✅ Inicio de sesión exitoso.
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="alerta">
+              ❌ Usuario o contraseña incorrectos.
+            </div>
+          `;
+        }
+      }
+
+      html += `</div>`;
+      document.getElementById("resultado").innerHTML = html;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Laboratorio de Seguridad Web</title>
+        <link rel="icon" type="image/png" href="seguridad.png">
+
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .sidebar {
+            width: 330px;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            position: relative;
+        }
+
+        .sidebar h2 {
+            font-size: 26px;
+            color: #0ea5e9;
+            margin-bottom: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .descripcion {
+            font-size: 14px;
+            background-color: #1e293b;
+            padding: 10px;
+            border-left: 4px solid #38bdf8;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            line-height: 1.4;
+        }
+
+        .descripcion strong {
+            display: block;
+            color: #93c5fd;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .separador {
+            margin: 15px 0;
+            border-top: 1px solid #334155;
+        }
+
+        .botones {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .botones a {
+            padding: 12px;
+            background-color: #0284c7;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .botones a:hover {
+            background-color: #0ea5e9;
+            transform: scale(1.03);
+        }
+
+        .contenido {
+            flex: 1;
+            padding: 0;
+            background-color: #ffffff;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-left: 1px solid #cbd5e1;
+        }
+
+  
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pasos,
+        .lema {
+            font-size: 14px;
+            margin: 15px 0;
+            color: #cbd5e1;
+        }
+
+        .lema {
+            font-size: 13px;
+            color: #60a5fa;
+            border-left: 3px solid #3b82f6;
+            padding-left: 10px;
+            margin-top: 10px;
+        }
+        
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div>
+            <img src="gatito.png" alt="Valery" style="width: 60px; border-radius: 50%; margin: 10px auto; display: block;">
+
+            <div style="text-align:center; margin-bottom: 20px;">
+                <h2>💻 Laboratorio de Seguridad Web - OWASP</h2>
+                <p style="color: #475569; font-size: 15px;">Desarrollado por <strong>Valery Chumpitaz</strong><br>
+                    Monitora de Análisis de Sistemas Empresariales</p>
+            </div>
+
+            <blockquote class="lema">
+                “La mejor defensa es conocer cómo atacan” – Valery 💡
+            </blockquote>
+
+            <div class="separador"></div>
+
+            <div class="descripcion">
+                <strong>1. SQL Injection (OWASP A03:2021)</strong>
+                Inserción maliciosa de comandos SQL en campos que no validan entrada. Permite acceder o manipular la base de datos.
+            </div>
+
+            <div class="descripcion">
+                <strong>2. Cross-Site Scripting - XSS (OWASP A07:2021)</strong>
+                Permite ejecutar scripts maliciosos en el navegador del usuario, robando datos o alterando el contenido.
+            </div>
+
+            <div class="descripcion">
+                <strong>3. Broken Authentication (OWASP A01:2021)</strong>
+                Fallas en el control de acceso y en la gestión de credenciales. Permite suplantar usuarios legítimos.
+            </div>
+        </div>
+
+        <div class="botones">
+            <a href="#" onclick="cargar('sql-injection-demo.html')">🔍 SQL Injection</a>
+            <a href="#" onclick="cargar('Cross-Site Scripting.html')">⚠️ Cross-Site Scripting</a>
+            <a href="#" onclick="cargar('Broken Authentication – Contraseña visible en texto plano.html')">🔓 Broken Authentication</a>
+        </div>
+    </div>
+
+    <div class="contenido">
+        <iframe id="visor" src=""></iframe>
+    </div>
+
+    <script>
+        function cargar(pagina) {
+            document.getElementById("visor").src = pagina;
+        }
+
+        window.onload = () => cargar('sql-injection-demo.html');
+    </script>
+
+</body>
+
+
+</html>

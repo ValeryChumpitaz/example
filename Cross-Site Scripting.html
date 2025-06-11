@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ejemplo de XSS - OWASP A07</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 40px;
+    }
+    .contenedor, .explicacion {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 45%;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #comentarios {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      background-color: #fafafa;
+    }
+    h2 { color: #007acc; }
+    code { background: #eee; padding: 2px 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor">
+    <h2>💬 Comentarios del Usuario</h2>
+    <p>Introduce un comentario. Ejemplo malicioso:  
+      <code>&lt;script&gt;alert("XSS")&lt;/script&gt;</code>
+    </p>
+    <input type="text" id="comentario" placeholder="Escribe tu comentario aquí...">
+    <button onclick="publicar()">Publicar</button>
+
+    <div id="comentarios"></div>
+  </div>
+
+  <div class="explicacion">
+    <h2>🛡️ ¿Qué vulnerabilidad se muestra?</h2>
+    <p>
+      Este es un ejemplo de <strong>Cross-Site Scripting (XSS)</strong>, del tipo reflejado. El sistema permite insertar código HTML o JavaScript directamente en el DOM sin validación.
+    </p>
+    <p>
+      Esto puede permitir a un atacante ejecutar scripts maliciosos en el navegador del usuario, robar cookies, redirigir páginas, etc.
+    </p>
+    <p><strong>Solución:</strong> Validar y sanitizar entradas. Nunca renderizar directamente el HTML sin escaparlo.</p>
+    <p><strong>Referencias:</strong> OWASP Top 10 - <code>A07:2021 – XSS</code></p>
+  </div>
+
+  <script>
+    function publicar() {
+      const entrada = document.getElementById("comentario").value;
+      const contenedor = document.getElementById("comentarios");
+      contenedor.innerHTML += `<p><strong>Usuario:</strong> ${entrada}</p>`;
+    }
+  </script>
+
+</body>
+</html>
