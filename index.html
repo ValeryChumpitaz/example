@@ -2,184 +2,190 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Laboratorio de Seguridad Web</title>
-        <link rel="icon" type="image/png" href="seguridad.png">
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard — Laboratorio OWASP</title>
+    <link rel="icon" href="seguridad.png" />
     <style>
+        :root {
+            --bg: #0f172a;
+            --card: #0b1220;
+            --accent: #38bdf8;
+            --muted: #94a3b8;
+            --white: #e6eef6
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
         body {
             margin: 0;
-            display: flex;
-            height: 100vh;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f1f5f9;
+            font-family: Inter, system-ui, Arial;
+            background: linear-gradient(180deg, #071024 0%, #0b1220 100%);
+            color: var(--white);
         }
 
-        .sidebar {
-            width: 330px;
-            background-color: #0f172a;
-            color: #e2e8f0;
-            padding: 25px;
+        .wrap {
+            max-width: 1200px;
+            margin: 28px auto;
+            padding: 20px
+        }
+
+        header {
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: space-between;
-            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
-            border-top-right-radius: 10px;
-            border-bottom-right-radius: 10px;
-            position: relative;
+            gap: 12px
         }
 
-        .sidebar h2 {
-            font-size: 26px;
-            color: #0ea5e9;
-            margin-bottom: 10px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .descripcion {
-            font-size: 14px;
-            background-color: #1e293b;
-            padding: 10px;
-            border-left: 4px solid #38bdf8;
-            margin-bottom: 12px;
-            border-radius: 6px;
-            line-height: 1.4;
-        }
-
-        .descripcion strong {
-            display: block;
-            color: #93c5fd;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-
-        .separador {
-            margin: 15px 0;
-            border-top: 1px solid #334155;
-        }
-
-        .botones {
+        .brand {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 10px;
+            align-items: center;
+            gap: 12px
         }
 
-        .botones a {
-            padding: 12px;
-            background-color: #0284c7;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-weight: 500;
+        .brand img {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px
         }
 
-        .botones a:hover {
-            background-color: #0ea5e9;
-            transform: scale(1.03);
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--accent)
         }
 
-        .contenido {
+        nav {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px
+        }
+
+        .tile {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+            padding: 14px;
+            border-radius: 12px;
+            min-width: 220px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.03)
+        }
+
+        .tile h3 {
+            margin: 0 0 6px;
+            font-size: 15px
+        }
+
+        .tile p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        main {
+            margin-top: 22px;
+            display: flex;
+            gap: 18px
+        }
+
+        .panel {
             flex: 1;
-            padding: 0;
-            background-color: #ffffff;
+            background: var(--card);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03)
         }
 
         iframe {
             width: 100%;
-            height: 100%;
-            border: none;
-            border-left: 1px solid #cbd5e1;
+            height: 72vh;
+            border-radius: 8px;
+            border: none
         }
 
-  
+        footer {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 13px
+        }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
+        @media(max-width:900px) {
+            main {
+                flex-direction: column
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            iframe {
+                height: 56vh
             }
         }
-
-        .pasos,
-        .lema {
-            font-size: 14px;
-            margin: 15px 0;
-            color: #cbd5e1;
-        }
-
-        .lema {
-            font-size: 13px;
-            color: #60a5fa;
-            border-left: 3px solid #3b82f6;
-            padding-left: 10px;
-            margin-top: 10px;
-        }
-        
     </style>
 </head>
 
 <body>
-
-    <div class="sidebar">
-        <div>
-            <img src="gatito.png" alt="Valery" style="width: 60px; border-radius: 50%; margin: 10px auto; display: block;">
-
-            <div style="text-align:center; margin-bottom: 20px;">
-                <h2>💻 Laboratorio de Seguridad Web - OWASP</h2>
-                <p style="color: #475569; font-size: 15px;">Desarrollado por <strong>Valery Chumpitaz</strong><br>
-                    Monitora de Análisis de Sistemas Empresariales</p>
+    <div class="wrap">
+        <header>
+            <div class="brand">
+                <img src="gatito.png" alt="Valery">
+                <div>
+                    <h1>Laboratorio OWASP — Dashboard</h1>
+                    <div style="font-size:13px;color:var(--muted)">Desarrollado por <strong>Valery Chumpitaz</strong>
+                    </div>
+                </div>
             </div>
-
-            <blockquote class="lema">
-                “La mejor defensa es conocer cómo atacan” – Valery 💡
-            </blockquote>
-
-            <div class="separador"></div>
-
-            <div class="descripcion">
-                <strong>1. SQL Injection (OWASP A03:2021)</strong>
-                Inserción maliciosa de comandos SQL en campos que no validan entrada. Permite acceder o manipular la base de datos.
+            <div style="text-align:right">
+                <div style="font-size:13px;color:var(--muted)">Entorno educativo — demos simuladas</div>
             </div>
+        </header>
 
-            <div class="descripcion">
-                <strong>2. Cross-Site Scripting - XSS (OWASP A07:2021)</strong>
-                Permite ejecutar scripts maliciosos en el navegador del usuario, robando datos o alterando el contenido.
+        <nav aria-label="Listado de demos">
+            <div class="tile" onclick="cargar('sql-Injection-demo.html')">
+                <h3>🔍 SQL Injection</h3>
+                <p>Demostración con modo seguro y modo vulnerable (simulado).</p>
             </div>
-
-            <div class="descripcion">
-                <strong>3. Broken Authentication (OWASP A01:2021)</strong>
-                Fallas en el control de acceso y en la gestión de credenciales. Permite suplantar usuarios legítimos.
+            <div class="tile" onclick="cargar('Cross-Site Scripting.html')">
+                <h3>⚠️ Cross-Site Scripting (XSS)</h3>
+                <p>Ejemplo reflejado y mitigaciones.</p>
             </div>
-        </div>
+            <div class="tile" onclick="cargar('Broken Authentication – Contraseña visible en texto plano.html')">
+                <h3>🔓 Broken Authentication</h3>
+                <p>Malas prácticas y soluciones.</p>
+            </div>
+        </nav>
 
-        <div class="botones">
-            <a href="#" onclick="cargar('sql-injection-demo.html')">🔍 SQL Injection</a>
-            <a href="#" onclick="cargar('Cross-Site Scripting.html')">⚠️ Cross-Site Scripting</a>
-            <a href="#" onclick="cargar('Broken Authentication – Contraseña visible en texto plano.html')">🔓 Broken Authentication</a>
-        </div>
-    </div>
+        <main>
+            <section class="panel">
+                <h2 style="margin-top:0">Visor de demos</h2>
+                <iframe id="visor" src="demos/sql.html" title="Visor de demos"
+                    sandbox="allow-scripts allow-forms"></iframe>
+            </section>
+            <aside style="width:280px">
+                <div class="panel">
+                    <h3 style="margin-top:0">Instrucciones</h3>
+                    <p style="color:var(--muted);font-size:13px">Haz clic en una demo para cargarla. Cada demo explica
+                        la vulnerabilidad, muestra el modo vulnerable (simulado) y el modo seguro con recomendaciones.
+                    </p>
+                    <h4 style="margin-top:12px">Material para estudiantes</h4>
+                    <ul style="color:var(--muted);font-size:13px">
+                        <li>Leer la explicación antes de ejecutar modos vulnerables.</li>
+                        <li>Estas demos no envían datos a servidores; todo es local.</li>
+                        <li>Usar en entornos de laboratorio solamente.</li>
+                    </ul>
+                </div>
+            </aside>
+        </main>
 
-    <div class="contenido">
-        <iframe id="visor" src=""></iframe>
+        <footer>
+            <small>Desarrollado por Valery — Laboratorio didáctico. Pide si quieres la versión con Tailwind/React o
+                archivos listos para GitHub Pages.</small>
+        </footer>
     </div>
 
     <script>
-        function cargar(pagina) {
-            document.getElementById("visor").src = pagina;
+        function cargar(ruta) {
+            document.getElementById('visor').src = ruta;
         }
-
-        window.onload = () => cargar('sql-injection-demo.html');
     </script>
-
 </body>
-
 
 </html>

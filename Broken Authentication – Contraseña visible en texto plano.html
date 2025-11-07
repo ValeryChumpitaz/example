@@ -1,76 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Broken Authentication - OWASP A01</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Demo — Broken Authentication (simulada)</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      padding: 40px;
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-    }
-    .login, .explicacion {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 45%;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    #mensaje {
-      margin-top: 20px;
-      background: #ffe0e0;
-      padding: 10px;
-      border: 1px solid #ff9999;
-      color: #cc0000;
-      border-radius: 5px;
-    }
-    h2 { color: #cc3300; }
+    :root{--bg:#f6f9fc;--card:#ffffff;--accent:#ef4444;--muted:#475569}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#0f172a;padding:22px}
+    .container{max-width:980px;margin:0 auto}
+    .card{background:var(--card);padding:20px;border-radius:12px;box-shadow:0 8px 26px rgba(2,6,23,0.06)}
+    h1{margin:0;color:var(--accent);font-size:20px}
+    p.lead{margin:6px 0 0;color:var(--muted)}
+    label{display:block;margin-top:10px;color:#334155;font-weight:600}
+    input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;margin-top:6px;font:inherit}
+    .row{display:flex;gap:10px;margin-top:12px}
+    button{padding:10px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+    button.primary{background:var(--accent);color:white}
+    button.ghost{background:transparent;border:1px solid #e6eef6}
+    .result{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef6fb}
+    .danger{background:#fff1f2;border-left:4px solid #ef4444;padding:10px;border-radius:6px;color:#7f1d1d}
+    .ok{background:#ecfdf5;border-left:4px solid #10b981;padding:10px;border-radius:6px;color:#065f46}
+    details{margin-top:12px}
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="card" role="article" aria-labelledby="title">
+      <h1 id="title">Simulación: Broken Authentication</h1>
+      <p class="lead">Objetivo: identificar malas prácticas en autenticación y aprender mitigaciones.</p>
 
-  <div class="login">
-    <h2>🔓 Login Inseguro</h2>
-    <label>Usuario:</label>
-    <input type="text" id="usuario" value="admin">
-    <label>Contraseña (visible):</label>
-    <input type="text" id="clave" value="admin123">
-    <button onclick="ingresar()">Ingresar</button>
-    <div id="mensaje"></div>
-  </div>
+      <label for="user">Usuario</label>
+      <input id="user" type="text" value="admin" autocomplete="off">
 
-  <div class="explicacion">
-    <h2>🔐 ¿Qué vulnerabilidad se muestra?</h2>
-    <p>
-      Este formulario presenta múltiples malas prácticas:
-    </p>
-    <ul>
-      <li>Campo de contraseña como <code>text</code> (debería ser <code>password</code>).</li>
-      <li>Las contraseñas se muestran en pantalla.</li>
-      <li>Se imprime directamente el valor ingresado.</li>
-    </ul>
-    <p>
-      Estas fallas están relacionadas con la categoría <strong>A01: Broken Authentication</strong> de OWASP.
-    </p>
-    <p><strong>Solución:</strong> Usar campos protegidos, cifrado y evitar imprimir información sensible.</p>
+      <label for="pass">Contraseña</label>
+      <input id="pass" type="password" value="admin123" autocomplete="off">
+
+      <div class="row">
+        <button id="login" class="primary">Iniciar sesión (simulado)</button>
+        <button id="toggle" class="ghost">Mostrar contraseña</button>
+        <button id="vuln" class="ghost">Activar malas prácticas (simulado)</button>
+      </div>
+
+      <div id="out" class="result" aria-live="polite"></div>
+
+      <details>
+        <summary>Explicación y mitigaciones</summary>
+        <ul>
+          <li>No mostrar ni almacenar contraseñas en texto plano; en servidor use hashing (bcrypt, Argon2).</li>
+          <li>Implementar multifactor (MFA), políticas de expiración de sesión y bloqueo por intentos fallidos.</li>
+          <li>Evitar exponer información sensible en respuestas y registros.</li>
+        </ul>
+      </details>
+
+    </div>
   </div>
 
   <script>
-    function ingresar() {
-      const usuario = document.getElementById("usuario").value;
-      const clave = document.getElementById("clave").value;
-      document.getElementById("mensaje").innerText = `¡Bienvenido ${usuario}! Tu contraseña fue: ${clave}`;
-    }
-  </script>
+    (function(){
+      const login = document.getElementById('login');
+      const toggle = document.getElementById('toggle');
+      const vuln = document.getElementById('vuln');
+      const out = document.getElementById('out');
+      const user = document.getElementById('user');
+      const pass = document.getElementById('pass');
+      let modeVuln = false;
 
+      // Toggle visibilidad de contraseña
+      toggle.addEventListener('click', ()=>{
+        pass.type = pass.type === 'password' ? 'text' : 'password';
+        toggle.textContent = pass.type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña';
+      });
+
+      // Activar modo malas prácticas (simulado)
+      vuln.addEventListener('click', ()=>{
+        modeVuln = !modeVuln;
+        vuln.textContent = modeVuln ? 'Modo malas prácticas: activado' : 'Activar malas prácticas (simulado)';
+        out.innerHTML = modeVuln ? '<div class="danger">⚠️ Modo vulnerable activado: la demo mostrará malas prácticas como contraseñas visibles y mensajes verborreicos.</div>' : '<div class="ok">🔒 Modo seguro: buenas prácticas recomendadas.</div>';
+      });
+
+      // Simulación de inicio de sesión
+      login.addEventListener('click', ()=>{
+        const u = user.value.trim();
+        const p = pass.value;
+        if(modeVuln){
+          // En modo vulnerable mostramos información que NUNCA debería mostrarse
+          out.innerHTML = `<div class="danger">🔓 Inicio de sesión simulado (malas prácticas). Usuario: <strong>${u}</strong>. Contraseña: <strong>${p}</strong>.</div>`;
+          return;
+        }
+
+        // Modo seguro: validaciones locales simuladas
+        if(p.length < 8){
+          out.innerHTML = '<div class="danger">❗ Contraseña demasiado corta. Aplicar políticas de complejidad y usar MFA.</div>';
+          return;
+        }
+
+        // Simulación de éxito
+        out.innerHTML = '<div class="ok">✅ Credenciales simuladas aceptadas. En producción: aplicar hashing, MFA y protección contra fuerza bruta.</div>';
+      });
+
+    })();
+  </script>
 </body>
 </html>

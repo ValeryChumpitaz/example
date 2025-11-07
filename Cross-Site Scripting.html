@@ -1,74 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Ejemplo de XSS - OWASP A07</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Demo — XSS (simulada)</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 40px;
-    }
-    .contenedor, .explicacion {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 45%;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    #comentarios {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      background-color: #fafafa;
-    }
-    h2 { color: #007acc; }
-    code { background: #eee; padding: 2px 4px; border-radius: 4px; }
+    :root{--bg:#fff;--accent:#0ea5e9;--muted:#475569}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#0f172a;padding:22px}
+    .container{max-width:980px;margin:0 auto}
+    .card{padding:20px;border-radius:12px}
+    h1{margin:0;color:var(--accent);font-size:20px}
+    p.lead{margin:6px 0 0;color:var(--muted)}
+    label{display:block;margin-top:10px;color:#334155;font-weight:600}
+    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;margin-top:6px;font:inherit}
+    .row{display:flex;gap:8px;margin-top:10px}
+    button{padding:10px;border-radius:8px;border:none;cursor:pointer}
+    .primary{background:var(--accent);color:white}
+    .danger{background:#fff1f2;border-left:4px solid #ef4444;padding:10px;border-radius:6px}
+    .ok{background:#ecfdf5;border-left:4px solid #10b981;padding:10px;border-radius:6px}
+    .result{margin-top:12px;padding:12px;border-radius:8px;background:#f8fafc;border:1px solid #eef6fb}
+    details{margin-top:12px}
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="card" role="article" aria-labelledby="title">
+      <h1 id="title">Simulación: Cross‑Site Scripting (XSS)</h1>
+      <p class="lead">Objetivo: mostrar la diferencia entre renderizar contenido sin escape y con escape (modo seguro).</p>
 
-  <div class="contenedor">
-    <h2>💬 Comentarios del Usuario</h2>
-    <p>Introduce un comentario. Ejemplo malicioso:  
-      <code>&lt;script&gt;alert("XSS")&lt;/script&gt;</code>
-    </p>
-    <input type="text" id="comentario" placeholder="Escribe tu comentario aquí...">
-    <button onclick="publicar()">Publicar</button>
+      <label for="comentario">Comentario</label>
+      <input id="comentario" type="text" placeholder='Ej.: &lt;script&gt;alert("XSS")&lt;/script&gt;'>
 
-    <div id="comentarios"></div>
-  </div>
+      <div class="row">
+        <button id="post" class="primary">Publicar (modo seguro)</button>
+        <button id="postv" style="background:#ef4444;color:white">Publicar (modo vulnerable)</button>
+        <button id="clear" style="background:#e6eef6">Limpiar</button>
+      </div>
 
-  <div class="explicacion">
-    <h2>🛡️ ¿Qué vulnerabilidad se muestra?</h2>
-    <p>
-      Este es un ejemplo de <strong>Cross-Site Scripting (XSS)</strong>, del tipo reflejado. El sistema permite insertar código HTML o JavaScript directamente en el DOM sin validación.
-    </p>
-    <p>
-      Esto puede permitir a un atacante ejecutar scripts maliciosos en el navegador del usuario, robar cookies, redirigir páginas, etc.
-    </p>
-    <p><strong>Solución:</strong> Validar y sanitizar entradas. Nunca renderizar directamente el HTML sin escaparlo.</p>
-    <p><strong>Referencias:</strong> OWASP Top 10 - <code>A07:2021 – XSS</code></p>
+      <div id="out" class="result" aria-live="polite"></div>
+
+      <details>
+        <summary>Explicación y mitigaciones</summary>
+        <ul>
+          <li>Escapar caracteres especiales (&lt;, &gt;, &, ") antes de insertarlos en el DOM.</li>
+          <li>Configurar Content Security Policy (CSP) para restringir orígenes y evitar ejecución de scripts no autorizados.</li>
+          <li>Evitar usar <code>innerHTML</code> con contenido no confiable; preferir textContent o librerías que manejen escape automático.</li>
+        </ul>
+      </details>
+
+    </div>
   </div>
 
   <script>
-    function publicar() {
-      const entrada = document.getElementById("comentario").value;
-      const contenedor = document.getElementById("comentarios");
-      contenedor.innerHTML += `<p><strong>Usuario:</strong> ${entrada}</p>`;
-    }
-  </script>
+    (function(){
+      const post = document.getElementById('post');
+      const postv = document.getElementById('postv');
+      const clear = document.getElementById('clear');
+      const out = document.getElementById('out');
+      const input = document.getElementById('comentario');
 
+      function escapeHtml(s){
+        return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#39;");
+      }
+
+      post.addEventListener('click', ()=>{
+        const v = input.value || '';
+        const safe = escapeHtml(v);
+        out.innerHTML += `<div class="ok"><strong>Comentario seguro:</strong> ${safe}</div>`;
+        input.value = '';
+      });
+
+      postv.addEventListener('click', ()=>{
+        const v = input.value || '';
+        // modo vulnerable: inserta sin escape (simulado, local)
+        out.innerHTML += `<div class="danger"><strong>Comentario (vulnerable):</strong> ${v}</div>`;
+        input.value = '';
+      });
+
+      clear.addEventListener('click', ()=>{ out.innerHTML = ''; });
+    })();
+  </script>
 </body>
 </html>

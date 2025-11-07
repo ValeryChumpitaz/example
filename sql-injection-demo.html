@@ -1,206 +1,278 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Simulación de Inyección SQL</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Demo — SQL Injection (simulada)</title>
   <style>
+    :root {
+      --bg: #f6f9fc;
+      --card: #ffffff;
+      --accent: #0369a1;
+      --muted: #475569;
+      --danger: #ef4444;
+      --ok: #10b981
+    }
+
     * {
-      box-sizing: border-box;
+      box-sizing: border-box
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background-color: #eef3f8;
       margin: 0;
-      padding: 20px;
+      font-family: Inter, system-ui, Arial;
+      background: var(--bg);
+      color: #0f172a;
+      padding: 22px
     }
 
-    .contenedor {
+    .container {
+      max-width: 980px;
+      margin: 0 auto
+    }
+
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 26px rgba(2, 6, 23, 0.06)
+    }
+
+    header {
       display: flex;
-      gap: 20px;
-      max-width: 1000px;
-      margin: auto;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px
     }
 
-    .formulario, .explicacion {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      flex: 1;
+    h1 {
+      margin: 0;
+      color: var(--accent);
+      font-size: 20px
     }
 
-    h2 {
-      text-align: center;
-      color: #007acc;
+    p.lead {
+      margin: 6px 0 0;
+      color: var(--muted)
+    }
+
+    form {
+      margin-top: 14px
     }
 
     label {
-      font-weight: bold;
-      margin-top: 10px;
       display: block;
+      margin-top: 10px;
+      color: #334155;
+      font-weight: 600
     }
 
-    input, button {
+    input {
       width: 100%;
       padding: 10px;
-      margin: 8px 0 20px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 8px;
+      border: 1px solid #e6eef6;
+      margin-top: 6px;
+      font: inherit
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px
     }
 
     button {
-      background-color: #007acc;
-      color: white;
-      font-weight: bold;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: none;
       cursor: pointer;
-      transition: background 0.3s;
+      font-weight: 600
     }
 
-    button:hover {
-      background-color: #005f99;
+    button.primary {
+      background: var(--accent);
+      color: white
     }
 
-    .resultado {
-      background-color: #f7f9fc;
-      padding: 15px;
-      border-left: 5px solid #007acc;
-      border-radius: 4px;
+    button.ghost {
+      background: transparent;
+      border: 1px solid #e6eef6
     }
 
-    .alerta {
-      background-color: #ffe5e5;
-      border-left: 5px solid red;
+    .result {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fbfdff;
+      border: 1px solid #eef6fb
+    }
+
+    pre {
+      background: #f3f4f6;
       padding: 10px;
-      margin-top: 10px;
-      color: #b30000;
-      border-radius: 4px;
+      border-radius: 6px;
+      overflow: auto
     }
 
-    .seguro {
-      background-color: #e5ffe5;
-      border-left: 5px solid green;
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(3, 105, 161, 0.08);
+      color: var(--accent);
+      font-weight: 600
+    }
+
+    .danger {
+      background: #fff1f2;
+      border-left: 4px solid var(--danger);
       padding: 10px;
-      margin-top: 10px;
-      color: #006600;
-      border-radius: 4px;
+      border-radius: 6px;
+      color: #7f1d1d
     }
 
-    code {
-      background-color: #f0f0f0;
-      display: block;
+    .ok {
+      background: #ecfdf5;
+      border-left: 4px solid var(--ok);
       padding: 10px;
-      border-radius: 4px;
-      margin-top: 10px;
-      font-family: 'Courier New', monospace;
+      border-radius: 6px;
+      color: #065f46
     }
 
-    .explicacion p {
-      font-size: 14px;
-      line-height: 1.6;
-      color: #333;
+    details {
+      margin-top: 12px
     }
 
-    .explicacion a {
-      color: #007acc;
-      text-decoration: none;
+    summary {
+      font-weight: 600;
+      color: #0f172a
     }
 
-    .explicacion a:hover {
-      text-decoration: underline;
+    ul {
+      margin: 8px 0 0 18px;
+      color: var(--muted)
+    }
+
+    footer {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    @media(max-width:720px) {
+      .actions {
+        flex-direction: column
+      }
     }
   </style>
 </head>
+
 <body>
+  <div class="container">
+    <div class="card" role="article" aria-labelledby="title">
+      <header>
+        <div>
+          <h1 id="title">Simulación: Inyección SQL</h1>
+          <div class="lead">Objetivo: comprender la mecánica de una consulta insegura y practicar mitigaciones básicas.
+          </div>
+        </div>
+        <div class="badge">A03 — OWASP (simulado)</div>
+      </header>
 
-  <div class="contenedor">
-    <!-- Formulario de inicio de sesión -->
-    <div class="formulario">
-      <h2>Simulación de Inyección SQL</h2>
-      <form onsubmit="simular(event)">
-        <label for="usuario">Nombre de usuario:</label>
-        <input type="text" id="usuario" value="valery">
+      <form id="form">
+        <label for="user">Usuario</label>
+        <input id="user" type="text" value="valery" autocomplete="off" aria-describedby="hint-user">
+        <small id="hint-user" style="color:var(--muted)">Ejemplo: <code>valery</code></small>
 
-        <label for="clave">Contraseña:</label>
-        <input type="text" id="clave" value="1234">
+        <label for="pass">Contraseña</label>
+        <input id="pass" type="password" value="1234" autocomplete="off">
 
-        <button type="submit">Iniciar sesión</button>
+        <div class="actions">
+          <button type="button" id="toggleVuln" class="ghost" aria-pressed="false">Mostrar modo vulnerable
+            (simulado)</button>
+          <button type="button" id="simulate" class="primary">Simular inicio de sesión</button>
+          <button type="button" id="limpiar" class="ghost">Limpiar</button>
+        </div>
       </form>
 
-      <div id="resultado"></div>
-    </div>
+      <div id="output" class="result" aria-live="polite"></div>
 
-    <!-- Explicación -->
-    <div class="explicacion">
-      <h2>¿Qué está ocurriendo?</h2>
-      <p>
-        Este formulario simula un inicio de sesión vulnerable a <strong>inyección SQL</strong>. La aplicación crea internamente una consulta similar a:
-      </p>
-      <code>SELECT * FROM usuarios WHERE usuario = '...' AND clave = '...'</code>
-      <p>
-        Si introduces cadenas maliciosas como <code>' OR '1'='1</code>, el sistema detecta que la consulta puede ser modificada y te alerta del riesgo.  
-      </p>
-      <p>
-        Es una forma sencilla de visualizar una de las vulnerabilidades más comunes según <a href="https://owasp.org" target="_blank">OWASP</a>.
-      </p>
+      <details>
+        <summary>Explicación detallada y mitigaciones</summary>
+        <ul>
+          <li>La consulta vulnerable se construye concatenando entradas:
+            <code>SELECT * FROM usuarios WHERE usuario = '...' AND clave = '...'</code>.</li>
+          <li>Un atacante puede introducir operadores o comentarios como <code>' OR '1'='1</code> para alterar la
+            lógica.</li>
+          <li><strong>Mitigaciones:</strong> usar consultas parametrizadas (Prepared Statements), validación de entrada
+            en servidor y principios de menor privilegio en la base de datos.</li>
+        </ul>
+      </details>
+
+      <footer>
+        <small>Nota: esta página simula los efectos localmente y no ejecuta consultas en bases reales. Está diseñada
+          para uso educativo.</small>
+      </footer>
     </div>
   </div>
 
   <script>
-    const usuariosValidos = [
-      { usuario: "valery", clave: "1234" },
-      { usuario: "admin", clave: "admin123" }
-    ];
+    (function () {
+      const btnV = document.getElementById('toggleVuln');
+      const btnSim = document.getElementById('simulate');
+      const btnLim = document.getElementById('limpiar');
+      const out = document.getElementById('output');
+      let vuln = false;
 
-    function contieneInyeccion(texto) {
-      const patrones = ["'", "--", "1=1", "OR", "AND", ";"];
-      return patrones.some(p => texto.toUpperCase().includes(p));
-    }
+      const usuarios = [{ u: 'valery', p: '1234' }, { u: 'admin', p: 'admin123' }];
 
-    function simular(event) {
-      event.preventDefault();
-
-      const usuario = document.getElementById("usuario").value.trim();
-      const clave = document.getElementById("clave").value.trim();
-      const consultaSQL = `SELECT * FROM usuarios WHERE usuario = '${usuario}' AND clave = '${clave}'`;
-
-      let html = `
-        <div class="resultado">
-          <strong>Consulta generada:</strong>
-          <code>${consultaSQL}</code>
-      `;
-
-      if (contieneInyeccion(usuario) || contieneInyeccion(clave)) {
-        html += `
-          <div class="alerta">
-            ⚠️ Posible inyección SQL detectada.<br>
-            Esta consulta podría ser manipulada maliciosamente.
-          </div>
-        `;
-      } else {
-        const valido = usuariosValidos.some(
-          u => u.usuario === usuario && u.clave === clave
-        );
-
-        if (valido) {
-          html += `
-            <div class="seguro">
-              ✅ Inicio de sesión exitoso.
-            </div>
-          `;
-        } else {
-          html += `
-            <div class="alerta">
-              ❌ Usuario o contraseña incorrectos.
-            </div>
-          `;
-        }
+      function detectarInyeccion(s) {
+        if (!s) return false;
+        const patrones = ["'", "--", ";", "/*", "*/", " OR ", " AND ", "1=1"];
+        const may = s.toUpperCase();
+        return patrones.some(p => may.includes(p.trim().toUpperCase()));
       }
 
-      html += `</div>`;
-      document.getElementById("resultado").innerHTML = html;
-    }
-  </script>
+      btnV.addEventListener('click', () => {
+        vuln = !vuln;
+        btnV.setAttribute('aria-pressed', String(vuln));
+        btnV.textContent = vuln ? 'Modo vulnerable activado (simulado)' : 'Mostrar modo vulnerable (simulado)';
+        out.innerHTML = vuln ? '<div class="danger">⚠️ Ha activado el modo vulnerable. Observe cómo se construye la consulta concatenada.</div>' : '<div class="ok">🔒 Modo seguro activo: las entradas se tratan como parámetros (simulado).</div>';
+      });
 
+      btnLim.addEventListener('click', () => {
+        document.getElementById('user').value = 'valery';
+        document.getElementById('pass').value = '1234';
+        out.innerHTML = '';
+      });
+
+      btnSim.addEventListener('click', () => {
+        const u = document.getElementById('user').value.trim();
+        const p = document.getElementById('pass').value;
+        // Construcción simulada de consulta (NO ejecutar en BD real)
+        const consulta = `SELECT * FROM usuarios WHERE usuario = '${u}' AND clave = '${p}'`;
+        let html = `<strong>Consulta simulada:</strong><pre>${consulta}</pre>`;
+
+        // Si modo vulnerable y patrones detectados -> marcar alerta
+        if (vuln && (detectarInyeccion(u) || detectarInyeccion(p))) {
+          html += `<div class="danger">⚠️ Posible inyección detectada (simulada). La entrada modifica la lógica de la consulta.</div>`;
+        } else {
+          // Validación simple contra lista local (simulada)
+          const ok = usuarios.some(x => x.u === u && x.p === p);
+          if (ok) {
+            html += `<div class="ok">✅ Inicio de sesión simulado exitoso.</div>`;
+          } else {
+            html += `<div class="danger">❌ Usuario o contraseña incorrectos (simulado).</div>`;
+          }
+        }
+
+        out.innerHTML = html;
+      });
+
+    })();
+  </script>
 </body>
+
 </html>
